@@ -1,0 +1,6 @@
+{
+	"listen_addr": "127.0.0.1:1337",
+	"db_driver": "sqlite",
+	"dsn": "ascanvas.db",
+	"log_level": "debug"
+}

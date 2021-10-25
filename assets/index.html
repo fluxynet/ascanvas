@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ASCII Canvas</title>
+	<style>
+body {
+	color: #333;
+		font-family: monospace;
+}
+
+.button {
+	border: 1px solid #c0c0c0;
+	background: #c4c4c4;
+	width: 11em;
+	padding: 10px;
+	text-align: center;
+	cursor: pointer;
+	margin: 4px 2px;
+	display: block;
+	border-radius: 0.5em;
+	font-size: 1.1em;
+}
+
+.button:hover {
+	background: #fff;
+}
+
+ul {
+	list-style: none;
+}
+
+li span {
+	color: #333;
+	border-bottom: 1px solid #c4c4c4c4;
+	cursor: pointer;
+}
+
+	</style>
+</head>
+<body>
+	<div id="app"></div>
+<script type="module">
+	import { html, render } from 'https://unpkg.com/lit-element/lit-element.js?module';
+	const app = document.getElementById("app");
+	const state = {
+		route: 'list',
+		listing: [],
+		canvas: {
+			name: '',
+			content: '',
+		},
+		watcher: null
+	};
+	
+	
+	const listCanvas = async (state) => {
+		try {
+			state.listing = await fetch("/api").then(r => r.json());
+		} catch (e) {
+			alert("An error occurred while fetching the list: " + e.message);
+		}
+	}
+	
+	const showList = async (state) => {
+		await listCanvas(state);
+		state.route = 'list';
+		
+		if (state.watcher !== null) {
+			state.watcher.close();
+			state.watcher = null;
+		}
+		
+		render(view(state), app);
+	};
+
+	const watch = (id) => {
+		if (!id) {
+			return;
+		}
+		
+		state.watcher = new EventSource(`/api/${id}/events`);
+		state.watcher.onerror = console.error;
+		state.watcher.onmessage = console.log;
+
+		state.watcher.addEventListener('UPDATED', ({data}) => {
+			state.canvas = JSON.parse(data);
+			render(view(state), app);
+		});
+		
+		state.watcher.addEventListener('DELETED', () => {
+			alert("The canvas has been deleted. Updates will be stopped.");
+			state.watcher.close();
+			state.watcher = null;
+		});
+	};
+
+	const showCanvas = (state, canvas) => {
+		state.canvas = canvas;
+		state.route = 'canvas';
+		
+		watch(canvas.id);
+		
+		render(view(state), app);
+		return false;
+	};
+	
+	const prettifyCanvas = (canvas) => {
+		let grid = '';
+		
+		for (let c = canvas.content; c !== ''; ) {
+			grid += c.substr(0, canvas.width) + "\n";
+			c = c.substr(canvas.width);
+		}
+		return grid;
+	};
+	
+	const view = (state) => html`
+	${ state.route === 'canvas' ? 
+		html`
+		<div><span class="button" @click=${() => showList(state)}>&larr; Back to listing</span></div>
+		<h1>${state.canvas.title}</h1>
+		<pre>${prettifyCanvas(state.canvas)}</pre>
+		`
+		:
+		html`
+		<h1>Canvas Listing</h1>
+		<ul>
+			${state.listing.map(canvas => html`<li @click="${() => showCanvas(state, canvas)}"><span>${canvas.name}</span></li>`)}
+		</ul>
+		`
+	}
+	`
+
+	watch();
+	showList(state);
+</script>
+</body>
+</html>

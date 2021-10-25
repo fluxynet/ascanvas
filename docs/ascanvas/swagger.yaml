@@ -1,0 +1,230 @@
+definitions:
+  ascanvas.Canvas:
+    properties:
+      content:
+        type: string
+      height:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      width:
+        type: integer
+    type: object
+  ascanvas.Coordinates:
+    properties:
+      x:
+        type: integer
+      "y":
+        type: integer
+    type: object
+  ascanvas.CreateArgs:
+    properties:
+      fill:
+        type: string
+      height:
+        type: integer
+      name:
+        type: string
+      width:
+        type: integer
+    type: object
+  ascanvas.TransformFloodfillArgs:
+    properties:
+      fill:
+        type: string
+      start:
+        $ref: '#/definitions/ascanvas.Coordinates'
+    type: object
+  ascanvas.TransformRectangleArgs:
+    properties:
+      fill:
+        type: string
+      height:
+        type: integer
+      outline:
+        type: string
+      top_left:
+        $ref: '#/definitions/ascanvas.Coordinates'
+      width:
+        type: integer
+    type: object
+  web.Response:
+    properties:
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ascanvas.Canvas'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: '"List all canvas items"'
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Canvas creation details
+        in: body
+        name: CreateArgs
+        required: true
+        schema:
+          $ref: '#/definitions/ascanvas.CreateArgs'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/ascanvas.Canvas'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: '"Create all canvas items"'
+  /{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Identifier of canvas to delete
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: ""
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: '"Delete a specific canvas item by id"'
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Identifier of canvas to fetch
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ascanvas.Canvas'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/web.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: Get a specific canvas by id
+  /{id}/events:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Identifier of canvas to observe
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/event-stream
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "500":
+          description: ""
+      summary: '"Obtain an SSE live stream of canvas events for a specific canvas
+        id"'
+  /{id}/floodfill:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Identifier of canvas to modify
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Flood fill transformation details
+        in: body
+        name: Transformation
+        required: true
+        schema:
+          $ref: '#/definitions/ascanvas.TransformFloodfillArgs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.Response'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: '"Apply flood fill on a specific canvas"'
+  /{id}/rectangle:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Identifier of canvas to modify
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Rectangle transformation details
+        in: body
+        name: Transformation
+        required: true
+        schema:
+          $ref: '#/definitions/ascanvas.TransformRectangleArgs'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.Response'
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: '"Draw a rectangle on a specific canvas"'
+swagger: "2.0"

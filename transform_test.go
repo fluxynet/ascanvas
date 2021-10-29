@@ -585,7 +585,7 @@ func TestTransformFloodfill(t *testing.T) {
  X  X
  X  X
  XXXX`),
-			wantErr: ascanvas.ErrOutOfBounds,
+			wantErr: ascanvas.ErrInvalidInput,
 		},
 		{
 			name: "Bad Coords 2",
@@ -608,7 +608,7 @@ func TestTransformFloodfill(t *testing.T) {
  X  X
  X  X
  XXXX`),
-			wantErr: ascanvas.ErrOutOfBounds,
+			wantErr: ascanvas.ErrInvalidInput,
 		},
 		{
 			name: "Bad Coords 3",

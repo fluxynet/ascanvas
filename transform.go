@@ -6,6 +6,10 @@ func TransformRectangle(canvas *Canvas, args TransformRectangleArgs) error {
 		grid       = canvas.AsGrid()
 	)
 
+	if err := args.Validate(); err != nil {
+		return err
+	}
+
 	if args.Width == 0 {
 		maxX = args.TopLeft.X
 	} else {
@@ -53,6 +57,10 @@ func TransformRectangle(canvas *Canvas, args TransformRectangleArgs) error {
 }
 
 func TransformFloodfill(canvas *Canvas, args TransformFloodfillArgs) error {
+	if err := args.Validate(); err != nil {
+		return err
+	}
+
 	if !canvas.Contains(args.Start) {
 		return ErrOutOfBounds
 	}

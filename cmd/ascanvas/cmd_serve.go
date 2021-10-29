@@ -97,7 +97,7 @@ func Serve(_ *cobra.Command, _ []string) {
 		r.Get("/", webCanvas.List)
 	})
 
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	router.Get("/*", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", web.ContentTypeHTML)
 		w.WriteHeader(http.StatusOK)
 		w.Write(ascanvas.IndexHTML)

@@ -4,7 +4,7 @@ A simple web server to perform drawing operations on a text canvas.
 
 This is intended for educational purposes.
 
-## Build Requirements:
+## Build Requirements
 The project was built using `go 1.17`.
 
 In case of code modification, the following projects are used for code generation and as such, must be installed. 
